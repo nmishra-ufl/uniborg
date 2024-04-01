@@ -4,8 +4,14 @@ from telethon.tl.functions.contacts import BlockRequest
 @borg.on(borg.admin_cmd(r"nf"))
 async def on_quick_block(event):
   await event.delete()
-  chat = await event.get_input_chat()
+  if not event.is_private:
+    return
 
+  sender = await event.get_sender()
+  if sender.contact or sender.bot:
+    return
+
+  chat = await event.get_input_chat()
   await borg(ReportSpamRequest(chat))
   await event.respond('@notafile')
   await borg(BlockRequest(chat))
