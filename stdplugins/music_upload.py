@@ -7,6 +7,7 @@ import shutil
 import mutagen
 from PIL import Image
 from telethon import utils
+from telethon.tl.types import DocumentAttributeAudio, DocumentAttributeFilename
 
 
 def get_embedded_art(f):
