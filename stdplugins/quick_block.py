@@ -7,8 +7,8 @@ async def on_quick_block(event):
   if not event.is_private:
     return
 
-  sender = await event.get_sender()
-  if sender.contact or sender.bot:
+  chat = await event.get_chat()
+  if chat.contact or chat.bot:
     return
 
   chat = await event.get_input_chat()
