@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 from io import BytesIO
 import shutil
+from collections import Counter
 
 import mutagen
 from PIL import Image
@@ -40,17 +41,26 @@ def get_music_thumb(f):
 
 def next_uploadable_dir():
   src_dir = Path('/sync/music_tg')
-  for metafile in sorted(src_dir.glob('*/meta.json')):
+  metafiles = sorted(src_dir.glob('*/meta.json'))
+  counters = Counter()
+  for metafile in metafiles:
+    counters['total'] += 1
     with open(metafile) as f:
       metadata = json.load(f)
 
     if metadata.get('skip'):
+      counters['skipped'] += 1
       continue
 
     parent = metafile.parent
-    if all((parent / path).exists() for path in metadata['files']):
-      yield parent, metadata
-      break
+    if not all((parent / path).exists() for path in metadata['files']):
+      counters['missing'] += 1
+      continue
+
+    yield parent, metadata
+    break
+
+  logger.info(f'Checked {counters["total"]}/{len(metafiles)} dirs, skipped {counters["skipped"]}, {counters["missing"]} with missing files')
 
 
 def get_music_attributes(path):
@@ -111,18 +121,18 @@ async def upload_dir(path, metadata):
 
 async def main():
   while 1:
-    for path, metadata in next_uploadable_dir():
-      try:
+    try:
+      for path, metadata in list(next_uploadable_dir()):
         num_uploaded = await upload_dir(path, metadata)
         await asyncio.sleep(180 * num_uploaded)
         break
-      except Exception as e:
-        # <1> sets the systemd log level, will get sent to tg via watcher bot
-        print(f'<1>Unhandled exception uploading {str(path)!r}')
-        logger.exception('Unhandled exception in upload loop')
-        await asyncio.sleep(300)
-    else:
-      await asyncio.sleep(60)
+      else:
+        await asyncio.sleep(60)
+    except Exception as e:
+      # <1> sets the systemd log level, will get sent to tg via watcher bot
+      print(f'<1>Unhandled exception uploading {str(path)!r}')
+      logger.exception('Unhandled exception in upload loop')
+      await asyncio.sleep(300)
 
 
 def unload():
