@@ -2,12 +2,12 @@
 
 ## Overview
 
-**uniborg** is a modular Telegram userbot built on the [Telethon](https://github.com/LonamiWebs/Telethon) framework. Its design allows users to enhance their Telegram experience through a variety of plugins that can be enabled or disabled as needed.
+**uniborg** is a modular [Telegram](https://telegram.org) userbot built on the [Telethon](https://github.com/LonamiWebs/Telethon) framework. Its design allows users to enhance their Telegram experience through a variety of plugins that can be enabled or disabled as needed.
 
 ## Features
 
 - **Modular Design**: Easily add or remove plugins to customize functionality.
-- **Asynchronous Operation**: Built with Python's `asyncio` for efficient performance.
+- **Asynchronous Operation**: Built with Python's [``asyncio``](https://docs.python.org/3/library/asyncio.html) for efficient performance.
 - **Event Handling**: Utilizes Telethon's event system to respond to various Telegram events.
 - **Simple Variables**: Each plugin gets the `borg`, `logger` and `storage` 
 [variables](https://github.com/udf/uniborg/blob/4805f2f6de7d734c341bb978318f44323ad525f1/uniborg/uniborg.py#L66-L68)
